@@ -13,79 +13,112 @@ class MyWidget extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyWidget> {
-  // Controllers separados
-  TextEditingController _nomeController = TextEditingController();
-  TextEditingController _cpfController = TextEditingController();
-  TextEditingController _numeroController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
+  TextEditingController _nomeController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _senhaController = TextEditingController();
+
+  String nomeSalvo = "";
+  String emailSalvo = "";
+  String senhaSalva = "";
   @override
   void dispose() {
     _nomeController.dispose();
-    _cpfController.dispose();
-    _numeroController.dispose();
+    _emailController.dispose();
+    _senhaController.dispose();
     super.dispose();
+  }
+
+  void cadastrar() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        nomeSalvo = _nomeController.text;
+        emailSalvo = _emailController.text;
+        senhaSalva = _senhaController.text;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cadastro realizado com sucesso!")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Cadastro de Usuário"),
         backgroundColor: Colors.lightBlueAccent,
         foregroundColor: Colors.white,
         centerTitle: true,
-        title: const Text('Tela de Prova'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nomeController,
-              decoration: const InputDecoration(
-                labelText: "Nome do Cliente",
-                border: OutlineInputBorder(),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // NOME
+              TextFormField(
+                controller: _nomeController,
+                decoration: const InputDecoration(
+                  labelText: "Nome",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Digite seu nome";
+                  }
+                  return null;
+                },
               ),
-            ),
 
-            SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            TextField(
-              controller: _cpfController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "CPF",
-                border: OutlineInputBorder(),
+              // EMAIL
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
 
-            SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            TextField(
-              controller: _numeroController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Número",
-                border: OutlineInputBorder(),
+              // SENHA
+              TextFormField(
+                controller: _senhaController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: "Senha",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
 
-            SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: () {
-                String nome = _nomeController.text;
-                String cpf = _cpfController.text;
-                String numero = _numeroController.text;
-
-                print("Nome: $nome");
-                print("CPF: $cpf");
-                print("Número: $numero");
-              },
-              child: const Text("Salvar"),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: cadastrar,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text("Cadastrar"),
+              ),
+              const SizedBox(height: 20),
+              if (nomeSalvo.isNotEmpty) ...[
+                Text("Nome: $nomeSalvo"),
+                Text("Email: $emailSalvo"),
+                Text("Senha: $senhaSalva"),
+              ],
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
   }
 }
